@@ -2,10 +2,13 @@ pipeline {
     agent any
 
     environment {
+        gcpCreds = credentials('gcp_credentials')
         dockerCreds = credentials('dockerhub_login')
         registry = "${dockerCreds_USR}/vatcal"
         registryCredentials = "dockerhub_login"
         dockerImage = "" // empty var, will be written to later
+        TF_VAR_gcp_project = "qwiklabs-gcp-00-5645aed24bff"
+        TF_VAR_docker_registry = "${registry}"
     }
 
     stages {
@@ -35,6 +38,19 @@ pipeline {
         stage('Clean Up') {
             steps {
                 sh "docker image prune --all --force --filter 'until=48h'"
+            }
+        }
+        stage('Provision Server'){
+            steps{
+                script {
+                    withCredentials([file(credentialsId: gcpCreds, variable:'GCP_CREDENTIALS')]) {
+                        sh '''
+                        export GOOGLE_APPLICATION_CREDENTIALS=$GCP_CREDENTIALS
+                        terraform init
+                        terraform apply -auto-approve
+                        '''
+                    }
+                }
             }
         }
     }
