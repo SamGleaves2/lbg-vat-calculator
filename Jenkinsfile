@@ -7,8 +7,8 @@ pipeline {
         registry = "${dockerCreds_USR}/vatcal"
         registryCredentials = "dockerhub_login"
         dockerImage = "" // empty var, will be written to later
-        TF_VAR_gcp_project = "qwiklabs-gcp-00-5645aed24bff"
-        TF_VAR_docker_registry = "${registry}"
+       // TF_VAR_gcp_project = "qwiklabs-gcp-00-5645aed24bff"
+       // TF_VAR_docker_registry = "${registry}"
     }
 
     stages {
@@ -40,7 +40,7 @@ pipeline {
                 sh "docker image prune --all --force --filter 'until=48h'"
             }
         }
-        stage('Provision Server'){
+        /*stage('Provision Server'){
             steps{
                 script {
                     withCredentials([file(credentialsId: gcpCreds, variable:'GCP_CREDENTIALS')]) {
@@ -53,6 +53,6 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
     }
 }
